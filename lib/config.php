@@ -1,7 +1,7 @@
 <?php
 // Alexey Novak <alexey.novak.mail@gmail.com>
 //
-// This is a class which is responsible for holding passed configuration settings.
+// This is a class which is responsible for holding program configuration settings.
 //
 class Config {
 	private $configs;   
@@ -18,8 +18,8 @@ class Config {
     }
     	
     
-    // Function to return a value from the config settings
-    // $key - key to the value in a config setting array
+    // Function to return a value from the config array
+    // $key - key to the value in a config array
     // 
     // return - variable from the config setting array
     //

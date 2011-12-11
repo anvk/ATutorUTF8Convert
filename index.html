@@ -9,15 +9,20 @@
 <body>
 	<div class="container"> 
 		<p>
-			<a href="archive/">Archive with all converted lang packages could be found here</a>. 
+			<a href="archive/">Archive of UTF-8 lang packages</a> 
 		</p>
-		<div id="up_txt">
-			
+		<p>
+			<div id="up_txt"></div>
+		</p>
+		<br /><br />
+		<div id="dropzone" style="min-height: 500px;">
+			<div id="def_text">Drop ATutor files here</div>
 		</div>
-		<div id="dropzone" style="min-height: 500px;"><div id="def_text">Drop files here</div></div>
 	</div>
+	
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="http://code.google.com/apis/gears/gears_init.js" type="text/javascript" charset="utf-8"></script>
+<script src="resources/scripts/browserDetect.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
 $(function() {
     
@@ -32,30 +37,54 @@ $(function() {
             }, false);
     $('#dropzone')
         .get(0)
-        .addEventListener('dragexit', function(event) { 
+        .addEventListener('dragexit', function(event) {
+                $('#dropzone').css("background-color", "#fff");
+            }, false);
+    $('#dropzone')	// need to add this one. Otherwise Chrome won't work for me
+        .get(0)
+        .addEventListener('dragleave', function(event) {
                 $('#dropzone').css("background-color", "#fff");
             }, false);
     $('#dropzone')
         .get(0)
-        .addEventListener('dragover', function(event) { 
-                event.preventDefault(); 
+        .addEventListener('dragover', function(event) {
+                event.preventDefault(); $('#dropzone').css("background-color", "#ffc");
             }, false);
     
     function upload(event) {
+        $('#dropzone').empty();		// Clean the div elements since we are going to upload a fresh batch of files
+        $('#up_txt').empty();
+        
+        // My fix so that FireFox would not attempt to open a zip file when you drop the file in the area
+        if(event.preventDefault) {
+        	event.preventDefault();
+		}
+        
         var that = this;				// EXAMPLE WHERE WE NEED TO USE 'THAT' instead of 'this' in order to make filenum variable accessible in closure.
         var data = event.dataTransfer;
 		
-        // Show spinner for each dropped file.
+        // Create a row with a spinner for every file we drag and dropped.
         var output = [];
         for (var i = 0; i < data.files.length; i++) {
-        	output.push('<li><strong>', data.files[i].name, '</strong> (', data.files[i].type || 'n/a', ') - ',
-                  data.files[i].size, ' bytes, last modified: ',
-                  data.files[i].lastModifiedDate.toLocaleDateString(), '<img src="resources/images/spinner.gif" width="16" height="16" /></li>');
+        	// Do not grab lastModifiedDate in FireFox browser since it is not supported there and it is a known bug
+        	if (BrowserDetect.browser === 'Firefox') {
+        		output.push('<li><strong>', data.files[i].name, '</strong> (', data.files[i].type || 'n/a', ') - ',
+                  data.files[i].size, ' bytes'
+                  , '<img src="resources/images/spinner.gif" width="16" height="16" /></li>');
+        	} else {
+ 				localeDate = data.files[i].lastModifiedDate.toLocaleDateString();
+ 				output.push('<li><strong>', data.files[i].name, '</strong> (', data.files[i].type || 'n/a', ') - ',
+                  data.files[i].size, ' bytes, last modified: '
+                  , data.files[i].lastModifiedDate.toLocaleDateString()
+                  , '<img src="resources/images/spinner.gif" width="16" height="16" /></li>');
+        	}
         }
-        that.filenum = data.files.length;
-        $('#dropzone').append($('<ul>' + output.join('') + '</ul>'));
         
-        // Building request for multiple file drag and drop.
+        that.filenum = data.files.length;									// Store number of files being uploaded. Using this inside inner function
+        
+        $('#dropzone').append($('<ul>' + output.join('') + '</ul>'));		// Update div with all the files in upload progress
+        
+        // Building request for multiple file upload.
         var xhr = new XMLHttpRequest()
         
 		var formData = new FormData();
@@ -67,17 +96,23 @@ $(function() {
 		xhr.open('POST', 'lib/doUpload.php', true);
 		xhr.send(formData);
 		
+		// Once all files are got uploaded and converted
 		xhr.onload = function(event) {
     		// If we got an error display it.
     		if (xhr.responseText) {
         		alert(xhr.responseText);
     		}
-    		// Make background back to white, say how many files converted.
-    		$('#dropzone').css('background-color', '#fff');
-    		$('#dropzone').empty();
-    		$('#dropzone').append($('<div id="def_text">Drop files here</div>'));
-    		$('#up_txt').empty();
-    		$('#up_txt').append($('<div id="def_text">Converted: '+ that.filenum +' files</div>'));
+    		
+    		$('#dropzone').css('background-color', '#fff');									// Make background back to white
+    		
+    		$('#dropzone').empty();															// Show "Drop ATutor files here
+    		$('#dropzone').append($('<div id="def_text">Drop Atutor files here</div>'));
+    		
+    		if (that.filenum > 1) {															// Show how many files were converted. Also a good indicator that
+    			$('#up_txt').html('Tried to convert : '+ that.filenum +' files');			// conversion job has completed.
+    		} else {
+    			$('#up_txt').html('Tried to convert : '+ that.filenum +' file');
+    		}
 		}; 
         
         event.stopPropagation();

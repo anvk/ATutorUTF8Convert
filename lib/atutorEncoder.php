@@ -10,7 +10,7 @@ class ATutorEncoder {
 	private $filer;
 	private $encoder;
 
-	// constructor. Using Inversion of Control concept here to load plugins:
+	// constructor. Using Inversion of Control to load plugins:
 	public function __construct($config, $uploader, $ziplib, $filer, $encoder) {
     	
     	if (empty($config)) {
@@ -61,7 +61,7 @@ class ATutorEncoder {
     	mylog('LangRecode class loaded.');
 	}
 	
-	// Function to upload file, unpack it then recode to UTF-8 and move the file to archive allowing user to download files
+	// Function which will take an input file, move to upload folde, unpack, convert and store in archive folder
     // $filePath - path to the tmp file which was uploaded through the input control
     // $fileName - name of the file which was uploaded
     // 
@@ -77,16 +77,25 @@ class ATutorEncoder {
 			$uploadedFileName = $uploadPath . $fileName;
 			
 			// Step 3. Upload and move the file
-			$this->uploader->uploadFile($filePath, $fileName);
+			if(!$this->uploader->uploadFile($filePath, $fileName)) {
+				return null;
+			}
 			
 			// Step 4. Unzip the archive
-			$this->ziplib->unzipFile($uploadedFileName);
+			if(!$this->ziplib->unzipFile($uploadedFileName)) {
+				$this->filer->removeFile($uploadedFileName);
+				return null;
+			}
 			
 			// Step 5. Remove archive
-			$this->filer->removeFile($uploadedFileName);
+			if(!$this->filer->removeFile($uploadedFileName)) {
+				return null;
+			}
 			
 			// Step 6. List all the unzipped files
-			$files = $this->filer->listFiles($uploadPath);
+			if(!$files = $this->filer->listFiles($uploadPath)) {
+				return null;
+			}
 			
 			// Step 7. Find charset encoding in the language pack
 			$charset = $this->getEncodingFromATutorLangPack();
@@ -114,17 +123,17 @@ class ATutorEncoder {
 		}
 	}
 	
-	// Function to find encoding from the language pack
+	// Function to find charset encoding from the language pack
     // 
     // return - String which represents file encoding
     //
 	public function getEncodingFromATutorLangPack() {
 		$charset = '';
 		
-		$file = $this->config->getConfig('LANG_INFO_FILE');
+		$lang_file = $this->config->getConfig('LANG_INFO_FILE');
 		$uploadPath = $this->config->getConfig('UPLOAD_PATH');
 		
-		$file = $uploadPath . $file;
+		$file = $uploadPath . $lang_file;
 		
 		if(!file_exists($file)) {
 			mylog('File ' . $file . ' does not exist', 'getEncodingFromATutorLangPack', true);
@@ -142,18 +151,18 @@ class ATutorEncoder {
 			
 			return $charset;
 		} catch(Exception $e) {
-			mylog('Exception caught: ' . $e->getMessage(), 'utf8_encodeFile', true);
+			mylog('Exception caught: ' . $e->getMessage(), 'getEncodingFromATutorLangPack', true);
 			return null;
 		}
 	}
 		
 	// Function to find a string between 2 other strings
 	// $s - Original string
-	// $str1 - string BEFORE the string we are looking for
-	// $str2 - string AFTER the string we are looking for
+	// $str1 - BEFORE the string we are looking for
+	// $str2 - AFTER the string we are looking for
 	// $ignore_case - True if we care about the character case
     // 
-    // return - string between $str1 and $str2 in a string $s
+    // return - a string which should reside between two other strings specified in the parameters
     //
 	function find_between($s, $str1, $str2, $ignore_case = false) {
 	    $func = $ignore_case ? stripos : strpos;
@@ -175,7 +184,7 @@ class ATutorEncoder {
 	// $s - Original string
 	// $tag - string <tag> which we are looking for in a string
     // 
-    // return - string between <$tag> and </$tag>
+    // return - string inside the tag
     //
 	function find_tag_content($s, $tag) {
 	    return $this->find_between($s, "<$tag>", "</$tag>", true);

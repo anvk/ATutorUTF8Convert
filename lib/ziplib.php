@@ -20,8 +20,8 @@ class ZipLib {
     	mylog('ZipLib class loaded.');
 	}
 	
-	// Function to unzip file in the same location where zip is located
-    // $fileFullName - server path to the zip archive
+	// Function to unzip all content of the archive in the same location where it is located
+    // $fileFullName - file name of the archive on a server
     // 
     // return - success
     //
@@ -52,8 +52,8 @@ class ZipLib {
 	}
 	
 	// Function to zip files into an archive
-    // $fullFileNames - array of the server paths to the files which will be archived
-    // $zipFullName - full path to the archive which will be created
+    // $fullFileNames - array of file names on a server 
+    // $zipFullName - file name on a server for an archive which will be created
     // $overwrite - flag to indicate if we want to overwrite an existing archive
     // 
     // return - success

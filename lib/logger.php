@@ -1,7 +1,7 @@
 <?php
 // Alexey Novak <alexey.novak.mail@gmail.com>
 //
-// My special debug function for writing a log line into php_log
+// My special debug function for writing a log line into php log
 //
 
 // Function to write a log

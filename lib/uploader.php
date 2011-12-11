@@ -20,10 +20,10 @@ class Uploader {
     	mylog('Upload class loaded.');
 	}
 	
-	// Function to save an uploaded file to the upload location specified in settings 
+	// Function to store a tmp uploaded file (which is removed) into a server location where it will be stored
     // $pathToFile - path to the tmp file which was uploaded through the input control
     // $fileName - name of the file which was uploaded
-    // $newFullFileName - serve full filename path where the uploaded file will reside 
+    // $newFullFileName - file name of the file on a server where it is gonna be stored
     // 
     // return - success
     //

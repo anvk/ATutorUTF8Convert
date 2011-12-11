@@ -45,7 +45,7 @@ for ($i=0; $i < $num_files; $i++) {
     $filePath = $_FILES['user_file']['tmp_name'][$i];
     $fileName = basename($_FILES['user_file']['name'][$i]);
     
-    $ut8EncodedFile = $atutorEncoder->utf8_encode($filePath, $fileName);
+    $atutorEncoder->utf8_encode($filePath, $fileName);
 }
 
 exit();

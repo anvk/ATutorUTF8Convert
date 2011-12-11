@@ -21,7 +21,7 @@ class Filer {
 	}
 	
 	// Function to remove a file
-    // $fullFileName - a server path to the file including file's name
+    // $fullFileName - File name on a server
     // 
     // return - success
     //
@@ -31,13 +31,13 @@ class Filer {
 			mylog('Removed ' . $fullFileName);
 			return true;
 		} catch (Exception $e) {
-			mylog('Exception caught: ' . $e->getMessage(), 'remove', true);
+			mylog('Exception caught: ' . $e->getMessage(), 'removeFile', true);
 			return false;
 		}
 	}
 	
 	// Function to remove files
-    // $fullFileNames - an array of server paths to the files including files' names
+    // $fullFileNames - an array of file names on a server
     // 
     // return - success
     //
@@ -58,10 +58,10 @@ class Filer {
 		return true;
 	}
 	
-	// Function to get all full paths of the files listed in the specified location on the server
+	// Function to get all file names on a server in a specified location
     // $path - path to the directory on the server
     // 
-    // return - array of full file paths
+    // return - array of file names on a server
     //
 	public function listFiles($path) {
 		try {

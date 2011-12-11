@@ -1,8 +1,17 @@
-1. Use cases
 
-	1. Drag and drop multiple ATutor language packs into the drang&drop area
-	2. Wait until files are converted
-	3. Click the link with all converted files and download any package
+1. Supported browsers. Tested on:
+
+	* Firefox version 8.0.1
+	* Chrome version 15.0.874.121
+
+
+2. How to use:
+
+	1. Select multiple ATutor language packages which you need to convert to UTF-8 on your computer
+	2. Drag and Drop them into the area which tells you "Drop ATutor files here"
+	3. Wait until files are being converted
+	4. Open the link which has an archive of all converted language packs
+	
 	
 2. Supported Charsets:
 
@@ -89,22 +98,26 @@
 	And specially for old Polish programs
 		mazovia
 
-3. Used resources to learn/use for this program:
+
+3. Sources:
 
 	* ConvertCharset.php library for character set conversion:
 		http://www.phpclasses.org/package/1360-PHP-Conversion-between-many-character-set-encodings.html
 		
-	* HTML5 Drag and Drop for multiple files
+	* Simple tutorial for HTML5 Multiple File Drag and Drop
 		http://www.appelsiini.net/2009/10/html5-drag-and-drop-multiple-file-upload
+		
 		
 4. Known issues
 
-	* This webpage is minimalistic and does not use any inclusive UI elements and not very user-friendly.
-	* In Firefox. Small inconvenience. Once files are selected for drag and drop, browser will ask to save one of the packages. No matter on what option is chosen files are still been encoded in UTF-8 and available.
-	* dropzone dragexit does not trigger. If you hover a language packages in the area, its background will stay coloured.
+	* This webpage is minimalistic and does not use any of the advanced UI elements
+	* (FIXED!) In Firefox. Small inconvenience. Once files are selected for drag and drop, browser will ask to save one of the packages. No matter on what option is chosen files are still been encoded in UTF-8 and available.
+	* (FIXED!) dropzone dragexit does not trigger. If you hover a language packages in the area, its background will stay coloured.
 	
-5. Used implementations
+	
+5. Some of the ideas
 
-	* Inversion of Control. Almost every class is treated as a plugin which is passed into a constructor of another class.
-	* The default few global variables are defined through a configuration which is represented as a hash array.
-	* encoder.php is a class which could be extended to use any conversion library (for my example I use ConvertCharset).
+	* Inversion of Control. Almost every class is treated as a plugin which is passed into a constructor of another class which brings more scalability to the page and allows to include or exclude specific parts of the program.
+	* Global variables are defined through a configuration array. Another instance of the page could be reconfigured based on the changes of that array.
+	* Encoder (encoder.php) is a class which could be modified to use any other library for charset conversion (for my example I used ConvertCharset).
+	
