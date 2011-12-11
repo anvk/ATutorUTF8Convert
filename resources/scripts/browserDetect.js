@@ -116,4 +116,3 @@ var BrowserDetect = {
 	]
 
 };
-BrowserDetect.init();

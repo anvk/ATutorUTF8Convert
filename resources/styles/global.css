@@ -7,14 +7,14 @@
   	text-align: centre;
   	font: 12pt bold 'Vollkorn';
   	color: #bbb;
+  	min-height: 500px;
 }
 
-#up_txt {
+#resultConverstionTxt {
   	text-align: centre;
   	font: 12 bold 'Vollkorn';
   	font-size: 12pt;
   	color: #000;
-  	position:absolute; 
 }
 
 .container{
@@ -25,7 +25,7 @@
   	vertical-align:middle; 
 }
 
-#def_text {
+#dropzone_text {
   	text-align: centre;
   	font: 26pt bold 'Vollkorn';
   	font-size: 26pt;

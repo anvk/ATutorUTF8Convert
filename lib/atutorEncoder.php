@@ -65,9 +65,17 @@ class ATutorEncoder {
     // $filePath - path to the tmp file which was uploaded through the input control
     // $fileName - name of the file which was uploaded
     // 
-    // return - If everything worked then return link to the new recoded file. Null otherwsie
+    // return - success
     //
 	public function utf8_encode($filePath, $fileName) {
+		$extensions = $this->config->getConfig('ALLOWED_EXTENDIONS');
+		
+		// check that the file name is of a proper extension
+	    if (!preg_match("/(" . $extensions . ")$/",$fileName)) {
+	    	mylog('File ' . $fileName . ' does not match allowed extensions ' . $extensions, 'utf8_encode', 'true');
+	    	return false;
+	    }
+		
 		try {
 
 			// Step 1. Find the uploaded path where we will have our uploaded language pack
@@ -78,31 +86,40 @@ class ATutorEncoder {
 			
 			// Step 3. Upload and move the file
 			if(!$this->uploader->uploadFile($filePath, $fileName)) {
-				return null;
+				$this->filer->deleteAll($uploadPath, true);
+				return false;
 			}
 			
 			// Step 4. Unzip the archive
 			if(!$this->ziplib->unzipFile($uploadedFileName)) {
-				$this->filer->removeFile($uploadedFileName);
-				return null;
+				$this->filer->deleteAll($uploadPath, true);
+				return false;
 			}
 			
 			// Step 5. Remove archive
 			if(!$this->filer->removeFile($uploadedFileName)) {
-				return null;
+				$this->filer->deleteAll($uploadPath, true);
+				return false;
 			}
 			
 			// Step 6. List all the unzipped files
 			if(!$files = $this->filer->listFiles($uploadPath)) {
-				return null;
+				$this->filer->deleteAll($uploadPath, true);
+				return false;
 			}
 			
 			// Step 7. Find charset encoding in the language pack
-			$charset = $this->getEncodingFromATutorLangPack();
+			if(!$charset = $this->getEncodingFromATutorLangPack()) {
+				$this->filer->deleteAll($uploadPath, true);
+				return false;
+			}
 			
 			// Step 8. Convert every single file we have
 			foreach($files as &$f) {
-				$this->encoder->utf8_encodeFile($f, $charset);
+				if(!$this->encoder->utf8_encodeFile($f, $charset)) {
+					$this->filer->deleteAll($uploadPath, true);
+					return false;
+				}
 			}
 			
 			// Step 9. Get the new file path where the converted file will reside in the archive
@@ -111,15 +128,18 @@ class ATutorEncoder {
 			$convertedFile = $archivePath . $prefix . $fileName;
 			
 			// Step 10. Zip all converted files in a new archive
-			$this->ziplib->zipFiles($files, $convertedFile);
+			if(!$this->ziplib->zipFiles($files, $convertedFile)) {
+				$this->filer->deleteAll($uploadPath, true);
+				return false;
+			}
 			
 			// Step 11. Remove all converted files except of new archive
-			$this->filer->removeFiles($files);
-			
-			return $convertedFile;
+			$this->filer->deleteAll($uploadPath, true);
+						
+			return true;
 		} catch (Exception $e) {
 			mylog('Exception caught: ' . $e->getMessage(), 'utf8_encode', true);
-			return null;
+			return false;
 		}
 	}
 	

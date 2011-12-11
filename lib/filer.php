@@ -72,6 +72,11 @@ class Filer {
 					if ($entry === "." || $entry === "..") {
 						continue;
 					}
+					
+					if (is_dir($entry)) {	// skip directories
+						continue;
+					}
+					
 					array_push($fileList, $path . $entry);
 			        mylog('Found file: ' . $entry);
 			    }
@@ -85,5 +90,47 @@ class Filer {
 			return null;
 		}
 	}
+	
+	// Function to remove all files and directories from a folder
+    // $directory - path to the directory on the server
+    // $empty - true if we want to leave directory empty, false if we want to remove directory as well
+    // 
+    // return - success
+    //
+	function deleteAll($directory, $empty = false) { 
+	    if(substr($directory,-1) == "/") { 
+	        $directory = substr($directory,0,-1); 
+	    } 
+	
+	    if(!file_exists($directory) || !is_dir($directory)) { 
+	        return false; 
+	    } elseif(!is_readable($directory)) { 
+	        return false; 
+	    } else { 
+	        $directoryHandle = opendir($directory); 
+	        
+	        while ($contents = readdir($directoryHandle)) { 
+	            if($contents != '.' && $contents != '..') { 
+	                $path = $directory . "/" . $contents; 
+	                
+	                if(is_dir($path)) { 
+	                    $this->deleteAll($path); 
+	                } else { 
+	                    unlink($path); 
+	                } 
+	            } 
+	        } 
+	        
+	        closedir($directoryHandle); 
+	
+	        if($empty == false) { 
+	            if(!rmdir($directory)) { 
+	                return false; 
+	            } 
+	        } 
+	        
+	        return true;
+	    } 
+	} 
 }
 ?>

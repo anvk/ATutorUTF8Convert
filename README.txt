@@ -120,4 +120,6 @@
 	* Inversion of Control. Almost every class is treated as a plugin which is passed into a constructor of another class which brings more scalability to the page and allows to include or exclude specific parts of the program.
 	* Global variables are defined through a configuration array. Another instance of the page could be reconfigured based on the changes of that array.
 	* Encoder (encoder.php) is a class which could be modified to use any other library for charset conversion (for my example I used ConvertCharset).
+	* Used JSLint in order to fix some of the JavaScript errors in my scripts
+	* Completely made a separation for HTML/JavaScript/Styling and moved every single code into separate files under resources/
 	
